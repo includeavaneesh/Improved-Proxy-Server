@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	
+
+	"./assets"
 )
 
 var (
@@ -19,8 +20,23 @@ type Handler struct {
 }
 
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.proxy.ServeHTTP(w, r)
-	fmt.Println("--------------------------------\nServing HTTP initiated")
+
+	remoteIP := assets.GetIP(r)
+	if assets.BlacklistIPCheckHandler(remoteIP) {
+
+		h.proxy.ServeHTTP(w, r)
+		fmt.Println("\n---------------------------------------------------------\nServing HTTP initiated")
+
+		fmt.Println("\nHTTP Response: 200\nDirecting user `" + remoteIP + "` to sever...")
+
+	} else {
+		// hijacker
+		fmt.Println("\n------------------ Error Details ------------------------\n")
+		fmt.Println(">> Denied access to IP: " + remoteIP + "\n\n")
+		assets.ConnectionHijacker(w, r)
+		fmt.Println("\n---------------------------------------------------------")
+	}
+
 }
 
 func ReverseProxyHandler() {
@@ -39,7 +55,6 @@ func ReverseProxyHandler() {
 	}
 
 	fmt.Println("Host:", url)
-	fmt.Println("Port:", "http://localhost:"+ )
 	reverseProxy := &httputil.ReverseProxy{Director: director}
 	handler := Handler{proxy: reverseProxy}
 	http.Handle("/", handler)
@@ -57,5 +72,7 @@ func ReverseProxyHandler() {
 }
 
 func main() {
+	assets.MongoInitiator()
 	ReverseProxyHandler()
+
 }
