@@ -1,10 +1,8 @@
-const net = require("net");
-const server = net.createServer();
+var express = require("express");
+var net = require("net");
+var app = express();
 
-// server.once("connection", (stream) => {
-// 	console.log("Ah we have our first user!");
-// });
-server.on("connection", (clientToProxySocket) => {
+app.on("connection", (clientToProxySocket) => {
 	// console.log(clientToProxySocket); //socket
 	console.log("Client connected to proxy");
 	clientToProxySocket.once("data", (data) => {
@@ -56,17 +54,16 @@ server.on("connection", (clientToProxySocket) => {
 		});
 	});
 });
-
-server.on("error", (err) => {
+app.on("error", (err) => {
 	console.log("Some internal server error occurred");
 	console.log(err);
 });
 
-server.on("close", () => {
+app.on("close", () => {
 	console.log("Client disconnected");
 });
 
-server.listen(
+app.listen(
 	{
 		host: "0.0.0.0",
 		port: 8080,
