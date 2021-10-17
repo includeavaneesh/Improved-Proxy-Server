@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "dns": "^0.2.2",
-    "express": "^4.17.1",
-    "request-ip": "^2.1.3"
-  }
-}

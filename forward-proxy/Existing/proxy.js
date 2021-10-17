@@ -1,16 +1,30 @@
-var express = require("express");
-var net = require("net");
-var app = express();
+const net = require("net");
+const server = net.createServer();
+const mongoose = require("mongoose");
+const Address = require("./models/ipSchema");
 
-app.on("connection", (clientToProxySocket) => {
+//Connecting to mongoose
+(async () => {
+	try {
+		await mongoose.connect("mongodb://localhost:27017/ISAA");
+		console.log("Connected to Database\n\n");
+	} catch (error) {
+		console.log(error);
+	}
+})();
+
+// server.once("connection", (stream) => {
+// 	console.log("Ah we have our first user!");
+// });
+server.on("connection", (clientToProxySocket) => {
 	// console.log(clientToProxySocket); //socket
+	console.log("--------------------------");
 	console.log("Client connected to proxy");
-	clientToProxySocket.once("data", (data) => {
+	clientToProxySocket.once("data", async (data) => {
 		let isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
-
 		let serverPort = 80;
 		let serverAddress;
-		console.log(data.toString());
+		console.log("Data to String: " + data.toString()); //CONNECT www.google.com HTTP/1.1
 		if (isTLSConnection) {
 			serverPort = 443;
 			serverAddress = data
@@ -21,7 +35,7 @@ app.on("connection", (clientToProxySocket) => {
 		} else {
 			serverAddress = data.toString().split("Host: ")[1].split("\r\n")[0];
 		}
-		console.log(serverAddress);
+		console.log("Server Address: " + serverAddress);
 
 		// Creating a connection from proxy to destination server
 		let proxyToServerSocket = net.createConnection(
@@ -54,16 +68,17 @@ app.on("connection", (clientToProxySocket) => {
 		});
 	});
 });
-app.on("error", (err) => {
+
+server.on("error", (err) => {
 	console.log("Some internal server error occurred");
 	console.log(err);
 });
 
-app.on("close", () => {
+server.on("close", () => {
 	console.log("Client disconnected");
 });
 
-app.listen(
+server.listen(
 	{
 		host: "0.0.0.0",
 		port: 8080,
