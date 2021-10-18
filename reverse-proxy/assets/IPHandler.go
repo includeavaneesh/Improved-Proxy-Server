@@ -17,7 +17,7 @@ func ConnectionHijacker(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf(">> Error: ")
 	http.Error(w, "forbidden", http.StatusForbidden)
 
-	return
+	// return
 }
 
 func GetIP(r *http.Request) string {

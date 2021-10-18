@@ -40,7 +40,7 @@ func GetWhitelistClient(Client *mongo.Client) *mongo.Collection {
 func BlacklistIPCheckHandler(ip string) bool {
 	collection := GetBlacklistClient(Client)
 	var check_ip IP
-	err := collection.FindOne(context.TODO(), bson.D{{"ip", ip}}).Decode(&check_ip)
+	err := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "ip", Value: ip}}).Decode(&check_ip)
 
 	return err == mongo.ErrNoDocuments
 
@@ -53,5 +53,5 @@ func MongoInitiator() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("MongoDb Connection Initialized...")
+	fmt.Println("✓ Database Connection Initialized...")
 }

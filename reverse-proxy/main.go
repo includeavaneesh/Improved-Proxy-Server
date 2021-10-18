@@ -19,15 +19,27 @@ type Handler struct {
 	proxy *httputil.ReverseProxy
 }
 
+func ResponseStatusHandler() {
+	res, err := http.Get(SERVER_URL)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("HTTP Response Status: %d\n", res.StatusCode)
+}
+
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	remoteIP := assets.GetIP(r)
+
 	if assets.BlacklistIPCheckHandler(remoteIP) {
 
 		h.proxy.ServeHTTP(w, r)
 		fmt.Println("\n---------------------------------------------------------\nServing HTTP initiated")
-
-		fmt.Println("\nHTTP Response: 200\nDirecting user `" + remoteIP + "` to sever...")
+		ResponseStatusHandler()
+		fmt.Println("\nDirecting user `" + remoteIP + "` to sever...")
+		// fmt.Println(statusCode)
 
 	} else {
 		// hijacker
@@ -54,12 +66,12 @@ func ReverseProxyHandler() {
 		req.URL.Host = url.Host
 	}
 
-	fmt.Println("Host:", url)
+	fmt.Println("✓ Host:", url)
 	reverseProxy := &httputil.ReverseProxy{Director: director}
 	handler := Handler{proxy: reverseProxy}
 	http.Handle("/", handler)
 
-	fmt.Println("Reverse proxy initialized at port: ", *port)
+	fmt.Println("✓ Reverse proxy initialized at port: ", *port)
 
 	if *port != 60 {
 		err := "Cannot access the server, please try again later"
