@@ -83,7 +83,6 @@ app.get("/", (req, res) => {
 		console.log(msg);
 		return;
 	}
-
 	var options = {
 		method: req.method,
 		url: req.url,
@@ -91,6 +90,7 @@ app.get("/", (req, res) => {
 		port: 80,
 		host: req.headers["host"],
 	};
+	console.log(options);
 	console.log(req.socket.remoteAddress + " " + req.method + " " + req.url);
 	var proxyReq = http.request(options, (proxyRes) => {
 		proxyRes.addListener("data", (chunk) => {
