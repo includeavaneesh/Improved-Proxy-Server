@@ -24,7 +24,7 @@ server.on("connection", (clientToProxySocket) => {
 		let isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
 		let serverPort = 80;
 		let serverAddress;
-		console.log("Data to String: " + data.toString()); //CONNECT www.google.com HTTP/1.1
+		//console.log("Data to String: " + data.toString()); //CONNECT www.google.com HTTP/1.1
 		if (isTLSConnection) {
 			serverPort = 443;
 			serverAddress = data
