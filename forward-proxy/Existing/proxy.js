@@ -13,17 +13,14 @@ const Address = require("./models/ipSchema");
 	}
 })();
 
-// server.once("connection", (stream) => {
-// 	console.log("Ah we have our first user!");
-// });
 server.on("connection", (clientToProxySocket) => {
 	// console.log(clientToProxySocket); //socket
 	console.log("--------------------------");
 	console.log("Client connected to proxy");
 	clientToProxySocket.once("data", async (data) => {
-		let isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
-		let serverPort = 80;
-		let serverAddress;
+		var isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
+		var serverPort = 80;
+		var serverAddress;
 		//console.log("Data to String: " + data.toString()); //CONNECT www.google.com HTTP/1.1
 		if (isTLSConnection) {
 			serverPort = 443;
@@ -38,7 +35,7 @@ server.on("connection", (clientToProxySocket) => {
 		console.log("Server Address: " + serverAddress);
 
 		// Creating a connection from proxy to destination server
-		let proxyToServerSocket = net.createConnection(
+		var proxyToServerSocket = net.createConnection(
 			{
 				host: serverAddress,
 				port: serverPort,
