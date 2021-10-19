@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-var ipSchema = new Schema({
+var addressSchema = new Schema({
 	IP: {
 		type: String,
 		address: String,
@@ -9,6 +9,6 @@ var ipSchema = new Schema({
 	},
 });
 
-var ipAdd = mongoose.model("ips", ipSchema);
+var Address = mongoose.model("addresses", addressSchema);
 
-module.exports = ipAdd;
+module.exports = Address;

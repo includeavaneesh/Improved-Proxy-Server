@@ -1,7 +1,7 @@
 const net = require("net");
 const server = net.createServer();
 const mongoose = require("mongoose");
-const Address = require("./models/ipSchema");
+const Address = require("./models/addSchema");
 
 //Connecting to mongoose
 (async () => {
