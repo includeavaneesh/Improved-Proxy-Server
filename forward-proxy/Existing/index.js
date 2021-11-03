@@ -3,6 +3,7 @@ const fs = require("fs");
 const server = net.createServer();
 
 var blacklist = [];
+var whitelist = [];
 
 fs.watchFile("./blacklist", (curr, prev) => {
 	updateBlacklist();
@@ -21,64 +22,69 @@ function updateBlacklist() {
 		});
 }
 
-function hostAllowed(url) {
-	for (i in blacklist) {
-		if (blacklist[i].test(url)) {
-			return false;
-		}
-	}
-	return true;
-}
-
 server.on("connection", (clientToProxySocket) => {
-	console.log("Client connected to the Proxy");
+	console.log("Client Connected To Proxy");
+	// We need only the data once, the starting packet
 	clientToProxySocket.once("data", (data) => {
-		var isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
-		var serverPort = isTLSConnection ? 443 : 80;
-		var serverAddress = isTLSConnection
-			? data.toString().split("CONNECT ")[1].split(" ")[0].split(":")[0]
-			: data.toString().split("Host: ")[1].split("\r\n")[0];
-		console.log("--x--");
-		console.log("Address: " + serverAddress);
-		if (!hostAllowed(serverAddress)) {
-			message =
-				"Host " + serverAddress + " has been denied by proxy configuration";
-			console.log(message);
-			return;
+		// If you want to see the packet uncomment below
+		// console.log(data.toString());
+
+		let isTLSConnection = data.toString().indexOf("CONNECT") !== -1;
+
+		// By Default port is 80
+		let serverPort = 80;
+		let serverAddress;
+		if (isTLSConnection) {
+			// Port changed if connection is TLS
+			serverPort = data
+				.toString()
+				.split("CONNECT ")[1]
+				.split(" ")[0]
+				.split(":")[1];
+			serverAddress = data
+				.toString()
+				.split("CONNECT ")[1]
+				.split(" ")[0]
+				.split(":")[0];
+		} else {
+			serverAddress = data.toString().split("Host: ")[1].split("\r\n")[0];
 		}
-		var proxyToServerSocket = net.createConnection(
+
+		console.log(serverAddress);
+
+		let proxyToServerSocket = net.createConnection(
 			{
 				host: serverAddress,
 				port: serverPort,
 			},
 			() => {
-				console.log("Proxy connected to the Server");
+				console.log("PROXY TO SERVER SET UP");
 				if (isTLSConnection) {
-					clientToProxySocket.write(
-						"HTTP/1.1 200 Connection established\r\n\r\n"
-					);
+					clientToProxySocket.write("HTTP/1.1 200 OK\r\n\n");
 				} else {
 					proxyToServerSocket.write(data);
 				}
+
 				clientToProxySocket.pipe(proxyToServerSocket);
 				proxyToServerSocket.pipe(clientToProxySocket);
 
 				proxyToServerSocket.on("error", (err) => {
-					console.log("Proxy Error");
+					console.log("PROXY TO SERVER ERROR");
 					console.log(err);
 				});
 			}
 		);
 		clientToProxySocket.on("error", (err) => {
-			console.log("Client Error");
+			console.log("CLIENT TO PROXY ERROR");
 			console.log(err);
 		});
 	});
 });
 
 server.on("error", (err) => {
-	console.log("Server Error");
+	console.log("SERVER ERROR");
 	console.log(err);
+	throw err;
 });
 
 server.on("close", () => {
@@ -86,7 +92,5 @@ server.on("close", () => {
 });
 
 server.listen(8124, () => {
-	console.log("Server listening on 8124");
+	console.log("Server runnig at http://localhost:" + 8124);
 });
-
-updateBlacklist();
