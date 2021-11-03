@@ -38,7 +38,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.proxy.ServeHTTP(w, r)
 		fmt.Println("\n---------------------------------------------------------\nServing HTTP initiated")
 		ResponseStatusHandler()
-		fmt.Println("\nDirecting user `" + remoteIP + "` to sever...")
+		fmt.Println("\nDirecting user `" + remoteIP + "` to server...")
 		// fmt.Println(statusCode)
 
 	} else {
