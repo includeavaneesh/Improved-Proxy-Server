@@ -39,14 +39,17 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("\n---------------------------------------------------------\nServing HTTP initiated")
 		ResponseStatusHandler()
 		fmt.Println("\nDirecting user `" + remoteIP + "` to server...")
+		assets.LogFile(remoteIP + " accessed http://localhost:60")
 		// fmt.Println(statusCode)
 
 	} else {
 		// hijacker
+		assets.LogFile(remoteIP + " accessed denied to http://localhost:60")
 		fmt.Println("\n------------------ Error Details ------------------------\n")
 		fmt.Println(">> Denied access to IP: " + remoteIP + "\n\n")
 		assets.ConnectionHijacker(w, r)
 		fmt.Println("\n---------------------------------------------------------")
+		
 	}
 
 }
