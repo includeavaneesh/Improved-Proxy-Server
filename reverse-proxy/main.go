@@ -40,7 +40,6 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ResponseStatusHandler()
 		fmt.Println("\nDirecting user `" + remoteIP + "` to server...")
 		assets.LogFile(remoteIP + " accessed http://localhost:60")
-		// fmt.Println(statusCode)
 
 	} else {
 		// hijacker
@@ -48,8 +47,8 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("\n------------------ Error Details ------------------------\n")
 		fmt.Println(">> Denied access to IP: " + remoteIP + "\n\n")
 		assets.ConnectionHijacker(w, r)
+		fmt.Print("The IP or the OS has been blacklisted from accessing the server, please contact the authorities :)")
 		fmt.Println("\n---------------------------------------------------------")
-		
 	}
 
 }
