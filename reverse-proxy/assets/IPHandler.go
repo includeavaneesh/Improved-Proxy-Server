@@ -27,3 +27,7 @@ func GetIP(r *http.Request) string {
 	}
 	return r.RemoteAddr
 }
+
+func IPError() {
+	fmt.Println("Client's IP has been blacklisted from accessing the server")
+}
