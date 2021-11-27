@@ -7,6 +7,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	// "strings"
+
 	"./assets"
 )
 
@@ -33,7 +35,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	remoteIP := assets.GetIP(r)
 
-	if assets.BlacklistIPCheckHandler(remoteIP) {
+	if assets.BlacklistIPCheckHandler(remoteIP) && assets.BlockOS(r) && assets.BlockTime() {
 
 		h.proxy.ServeHTTP(w, r)
 		fmt.Println("\n---------------------------------------------------------\nServing HTTP initiated")
@@ -43,11 +45,15 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		// hijacker
+
 		assets.LogFile(remoteIP + " accessed denied to http://localhost:60")
 		fmt.Println("\n------------------ Error Details ------------------------\n")
 		fmt.Println(">> Denied access to IP: " + remoteIP + "\n\n")
 		assets.ConnectionHijacker(w, r)
-		fmt.Print("The IP or the OS has been blacklisted from accessing the server, please contact the authorities :)")
+		if !assets.BlockTime(){
+			assets.TimeError()
+		}
+		fmt.Print("Please contact the authorities for further information. Have a nice day!")
 		fmt.Println("\n---------------------------------------------------------")
 	}
 
