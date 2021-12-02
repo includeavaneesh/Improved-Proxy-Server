@@ -4,7 +4,7 @@ const fs = require("fs");
 
 var app = express();
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 const PORT = 5000;
 
@@ -36,7 +36,7 @@ app.post("/", (req, res) => {
 		.map((url) => url.trim());
 	newUrl.trim();
 	blacklistContent.push(newUrl);
-	fs.writeFileSync("../blacklist", blacklistContent.join("\r\n"));
+	fs.writeFileSync("../blacklist", blacklistContent.join("\n"));
 	console.log("Updated blacklist");
 	res.redirect("/");
 });
